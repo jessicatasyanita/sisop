@@ -1,52 +1,20 @@
 #!/bin/bash
 
 awk -F "\t" '
-BEGIN {central = 0;
-        east = 0;
-        south =0;
-        west = 0;}
+BEGIN {profitkecil = 999999999999}
 {   
-    region = $13
-    if (region != "Region")
+    reg = $13
+    if (reg != "Region")
     {
-        if (region == "Central")
-        {   
-            central += $21
-        }
-        else if (region == "East")
-        {
-            east += $21
-        }
-        else if (region == "South")
-        {
-            south += $21
-        }
-        else if (region == "West")
-        {
-            west += $21
-        }
+        region[reg]+= $21
     }
 }
 END {
-    if (central < east && central < south && central < west)
-    {
-        terkecil = central
-        regionkecil = "Central"
+    for (i in region){
+        if(region[i] <= profitkecil){
+            regionkecil = i
+            profitkecil = region[i]
+        }
     }
-    else if (east < central && east < south && east < west)
-    {
-        terkecil = east
-        regionkecil = "East"
-    }
-    else if (south < central && south < east && south < west)
-    {
-        terkecil = south
-        regionkecil = "South"
-    }
-    else if (west < central && west < east && west < south)
-    {
-        terkecil = west
-        regionkecil = "West"
-    }
-    print regionkecil, terkecil
+    print regionkecil, profitkecil
 }' Laporan-TokoShiSop.tsv

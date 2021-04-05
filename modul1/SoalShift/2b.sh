@@ -14,5 +14,6 @@ BEGIN {}
         }
     }
 }
-END {for (i in custname)
+END {print("Daftar nama customer di Albuquerque pada tahun 2017 antara lain: ")
+    for (i in custname)
         print i}' Laporan-TokoShiSop.tsv
