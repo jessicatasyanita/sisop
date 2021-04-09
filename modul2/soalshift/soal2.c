@@ -6,7 +6,7 @@
 #include <dirent.h>
 #include <string.h>
 
-char *isi_ket;
+//char *isi_ket;
 
 void unzip(char *path){
 	pid_t child_id=fork ();
@@ -39,6 +39,16 @@ void del_folder(char *path){
     }
 }
 
+void make_ket(char *filename, char *isi_ket){
+	FILE *file = fopen(filename, "a");
+
+	if (file){
+		fprintf(file, "%s", isi_ket);
+		fclose(file);
+	}
+
+}
+
 void make_dir(char *path){
 	pid_t child_id=fork ();
 	if (child_id==0){
@@ -69,16 +79,6 @@ void del_file(char *path){
     }
 }
 
-void make_ket(char *filename){
-	FILE *file = fopen(filename, "w");
-
-	if (file){
-		fprintf(file, "%s\n", isi_ket);
-		fclose(file);
-	}
-
-}
-
 void copy_file(char *source, char *destination){
 	pid_t child_id=fork ();
 	if (child_id==0){
@@ -106,19 +106,25 @@ int split_string(char *original, char *filename){
     char *path = malloc(64*sizeof(char));
     sprintf(path, "./petshop/%s", jenis);
 
-    make_dir(path);
+	char *isi_ket = malloc(64*sizeof(char));
+    isi_ket[0] = 0;
+ 	sprintf(isi_ket, "nama\t: %s\numur\t: %s\n\n", nama, usia);
+
+	char *path2 = malloc(64*sizeof(char));
+	sprintf(path2, "./petshop/%s/keterangan.txt", jenis);
+
+	make_dir(path);
+	make_ket(path2, isi_ket);
 
     char *namafile = malloc(64*sizeof(char));
     sprintf(namafile, "./petshop/%s/%s.jpg", jenis,nama);
 
-    sprintf(isi_ket+strlen(isi_ket), "nama\t: %s\numur\t: %s\n\n", nama, usia);
-
     copy_file(original, namafile);
     //printf("%s\n", path);
     free(path);
-    //printf( " %s\n", jenis);
-    // printf( " %s\n", nama);
-    // printf( " %s\n", usia);
+	free(namafile);
+	free(isi_ket);
+	free(path2);
 }
 
 int read_file(){
@@ -128,8 +134,8 @@ int read_file(){
 	/* print all the files and directories within directory */
 	while ((ent = readdir (dir)) != NULL) {
 		if(strcmp(ent->d_name, ".") != 0 && strcmp(ent->d_name, "..") != 0 && strcmp(ent->d_name, "soal2") != 0 && 
-			strcmp(ent->d_name, "soal2.c") != 0 && strcmp(ent->d_name, "pets.zip") != 0 && strcmp(ent->d_name, "keterangan.txt") != 0
-            && strcmp(ent->d_name, "petshop") != 0){
+			strcmp(ent->d_name, "soal2.c") != 0 && strcmp(ent->d_name, "pets.zip") != 0 && 
+			strcmp(ent->d_name, "keterangan.txt") != 0 && strcmp(ent->d_name, "petshop") != 0){
 			//printf ("%s\n", ent->d_name);
             char *namafile = malloc(64*sizeof(char));
             sprintf(namafile, "%s", ent->d_name);
@@ -145,21 +151,20 @@ int read_file(){
             split_string(ent->d_name, hewan);
 
             del_file(ent->d_name);
+			free(namafile);
 		}
 	}
 	closedir (dir);
 	} else {
-	/* could not open directory */
+	//kalau directory nya gabisa dibuka
 	perror ("");
 	return EXIT_FAILURE;
 	}
 }
 
-//rm -r */
-
 int main(){
-    isi_ket = malloc(10000*sizeof(char));
-    isi_ket[0] = 0;
+    // isi_ket = malloc(10000*sizeof(char));
+    // isi_ket[0] = 0;
     unzip("pets.zip");
 	del_folder("apex_cheats/");
 	del_folder("musics/");
@@ -167,6 +172,6 @@ int main(){
     //printf("success\n");
 	make_dir("petshop");
 	read_file();
-    make_ket("keterangan.txt");
-    free(isi_ket);
+    //make_ket("keterangan.txt");
+    //free(isi_ket);
 }
