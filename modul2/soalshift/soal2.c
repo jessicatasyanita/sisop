@@ -16,7 +16,7 @@ void unzip(char *source, char *destination){
 	      "/usr/bin/unzip",
 	      source,
 		"-d",
-		destination,
+		  destination,
 	      NULL);
 	}
     else{
@@ -110,7 +110,7 @@ int split_string(char *original, char *filename){
 
 	char *isi_ket = malloc(64*sizeof(char));
     isi_ket[0] = 0;
- 	sprintf(isi_ket, "nama\t: %s\numur\t: %s\n\n", nama, usia);
+ 	sprintf(isi_ket, "nama\t: %s\numur\t: %s\n", nama, usia);
 
 	char *path2 = malloc(64*sizeof(char));
 	sprintf(path2, "./petshop/%s/keterangan.txt", jenis);
@@ -147,7 +147,8 @@ int read_file(){
 		struct stat statbuf;
 		stat(namapath, &statbuf);
 
-		if (S_ISDIR(statbuf.st_mode)){ //https://stackoverflow.com/questions/4553012/checking-if-a-file-is-a-directory-or-just-a-file
+		if (S_ISDIR(statbuf.st_mode)){ 
+			//https://stackoverflow.com/questions/4553012/checking-if-a-file-is-a-directory-or-just-a-file
 			//delete
 
 			sprintf(namapath, "petshop/%s", ent->d_name);
