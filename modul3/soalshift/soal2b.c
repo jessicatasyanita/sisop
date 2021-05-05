@@ -91,17 +91,16 @@ void *faktorial(void *arguments){
     int baris=args->arg1;
     int kolom=args->arg2;
     int temp=0;
-    int faktorial = 1;
 
     if (matrixA[baris][kolom] == 0 || matrixB[baris][kolom] == 0){
-        printf("0\t");
+        printf("0 ");
        // temp = 0;
     }
     if(matrixA[baris][kolom]>matrixB[baris][kolom]){
         //a!/(a-b)!
         for (int i = 1; i >= matrixB[baris][kolom]; i++)
         {
-            printf("%d\t", matrixA[baris][kolom]);
+            printf("%d ", matrixA[baris][kolom]);
             matrixA[baris][kolom]--;
         }
         
@@ -110,7 +109,7 @@ void *faktorial(void *arguments){
         //a!
         for (int i = matrixA[baris][kolom]; i > 0; i++)
         {
-            printf("%d\t", matrixA[baris][kolom]);
+            printf("%d ", matrixA[baris][kolom]);
             matrixA[baris][kolom]--;
         }
     }
