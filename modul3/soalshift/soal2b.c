@@ -98,7 +98,7 @@ void *faktorial(void *arguments){
     }
     if(matrixA[baris][kolom]>matrixB[baris][kolom]){
         //a!/(a-b)!
-        for (int i = 1; i >= matrixB[baris][kolom]; i++)
+        for (int i = 1; i >= matrixB[baris][kolom]; i--)
         {
             printf("%d ", matrixA[baris][kolom]);
             matrixA[baris][kolom]--;
@@ -107,7 +107,7 @@ void *faktorial(void *arguments){
     }
     if(matrixB[baris][kolom]>matrixA[baris][kolom]){
         //a!
-        for (int i = matrixA[baris][kolom]; i > 0; i++)
+        for (int i = matrixA[baris][kolom]; i > 0; i--)
         {
             printf("%d ", matrixA[baris][kolom]);
             matrixA[baris][kolom]--;
