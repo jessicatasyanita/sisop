@@ -15,6 +15,7 @@ key_t key = 1234;
 int *matrix;
 int cnt=0;
 const int matrixB[x][z] = {{1, 2, 3, 4, 5, 11}, {6, 7, 8, 9, 10, 14}, {1, 2, 3, 4, 5, 16}, {1, 2, 3, 4, 5, 16}};
+//const int matrixB[x][z] = {{1, 1, 1, 1, 1, 1}, {1, 1, 1, 1, 1, 1}, {1, 1, 1, 1, 1, 1}, {1, 1, 1, 1, 1, 1}};
 int matrixA[x][z];
 //int matrixB[x][z];
 int total=x*z;
@@ -69,6 +70,14 @@ int main(void){
 
     assign_matrixA();
     cnt=0;
+    printf("\n");
+    for(int i=0; i<x; i++){
+        for(int j=0; j<z; j++){
+            printf("%d\t", matrixB[i][j]);
+        }
+        printf("\n");
+    }
+    printf("\n");
     //input matrixB
 //     for (int i = 0; i < x; i++) {
 //       for (int j = 0; j < z; j++) {
@@ -90,28 +99,34 @@ void *faktorial(void *arguments){
 
     int baris=args->arg1;
     int kolom=args->arg2;
-    int temp=0;
+    long long int hasil=1;
 
     if (matrixA[baris][kolom] == 0 || matrixB[baris][kolom] == 0){
-        printf("0 ");
+        printf("0");
        // temp = 0;
     }
-    if(matrixA[baris][kolom]>matrixB[baris][kolom]){
+    else if(matrixA[baris][kolom]>matrixB[baris][kolom]){
         //a!/(a-b)!
-        for (int i = 1; i >= matrixB[baris][kolom]; i--)
+        int batas = matrixA[baris][kolom] - matrixB[baris][kolom];
+        for (int i = matrixA[baris][kolom]; i > batas; i--)
         {
-            printf("%d ", matrixA[baris][kolom]);
-            matrixA[baris][kolom]--;
+            hasil = hasil*i;
+            //printf("%d ", i);
         }
+        //printf("\n");
+        printf("%lld", hasil);
         
     }
-    if(matrixB[baris][kolom]>matrixA[baris][kolom]){
+    else if(matrixB[baris][kolom]>matrixA[baris][kolom]){
         //a!
         for (int i = matrixA[baris][kolom]; i > 0; i--)
         {
-            printf("%d ", matrixA[baris][kolom]);
+            hasil = hasil * matrixA[baris][kolom];
+            //printf("%d ", matrixA[baris][kolom]);
             matrixA[baris][kolom]--;
         }
+        printf("%lld", hasil);
     }
+    printf("\t\t");
     pthread_exit(0);
 }
