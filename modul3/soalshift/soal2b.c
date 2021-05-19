@@ -1,133 +1,94 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 #include <unistd.h>
-#include <pthread.h>
-#include <sys/ipc.h>
-#include <sys/shm.h>
 
-#define x 4
-#define z 6
+int pid;
+int pipe1[2];
+int pipe2[2];
 
-pthread_t tid[x*z];
-pthread_attr_t attr;
-int iret[x*z];
-key_t key = 1234;
-int *matrix;
-int cnt=0;
-// const int matrixB[x][z] = {{14, 2, 3, 8, 8, 10}, {7, 4, 8, 5, 14, 9}, {9, 2, 13, 5, 11, 2}, {8, 7, 10, 4, 10, 8}};
-//const int matrixB[x][z] = {{1, 1, 1, 1, 1, 1}, {1, 1, 1, 1, 1, 1}, {1, 1, 1, 1, 1, 1}, {1, 1, 1, 1, 1, 1}};
-int matrixA[x][z];
-int matrixB[x][z];
-int total=x*z;
 
-void *faktorial(void *arguments);
+void exec1() {
+  dup2(pipe1[1], 1);
 
-struct arg_struct{
-    int arg1;
-    int arg2;
-};
+  close(pipe1[0]);
+  close(pipe1[1]);
 
-void assign_matrixA(){
-    cnt=0;
-    for(int i=0; i<x; i++){
-        for(int j=0; j<z; j++){
-            matrixA[i][j] = matrix[cnt];
-            //printf("%d\t", matrixA[i][j]);
-            cnt++;
-        }
-        //printf("\n");
-    }
+  execlp("ps", "ps", "aux", NULL);
+  // exec gajalan, keluar
+  perror("bad exec ps");
+  _exit(1);
 }
 
-void call_thread(){
-    for(int i=1; i<x+1; i++){
-        for(int j=1; j<z+1; j++){
-            struct arg_struct *args = (struct arg_struct *) malloc(sizeof(struct arg_struct));
-            args->arg1 = i-1;
-            args->arg2 = j-1;
-            pthread_attr_init(&attr);
-            iret[cnt] = pthread_create(&tid[cnt], &attr, faktorial, args);
-            if(iret[cnt]){
-                fprintf(stderr,"Error - pthread_create() return code: %d\n", iret[cnt]);
-                exit(EXIT_FAILURE);
-            }
-            pthread_join(tid[cnt], NULL);
-            cnt++;
-        }
-        printf("\n");
-    }
+void exec2() {
+  // input dari pipe1
+  dup2(pipe1[0], 0);
+  // output ke pipe2
+  dup2(pipe2[1], 1);
 
-    for(int i=0; i<total; i++){
-        pthread_join(tid[i], NULL);
-    }
+  close(pipe1[0]);
+  close(pipe1[1]);
+  close(pipe2[0]);
+  close(pipe2[1]);
+ 
+  execlp("sort", "sort", "-nrk", "3,3", NULL);
+  // exec gajalan, keluar
+  perror("bad exec sort");
+  _exit(1);
 }
 
-int main(void){
-    int shmid = shmget(key, sizeof(matrix), IPC_CREAT | 0666);
-    matrix = shmat(shmid, 0, 0);
+void exec3() {
+  dup2(pipe2[0], 0);
 
-    //matrixB[x][z] = {{1, 2, 3, 4, 5, 11}, {6, 7, 8, 9, 10, 14}, {1, 2, 3, 4, 5, 16}, {1, 2, 3, 4, 5, 16}};
+  close(pipe2[0]);
+  close(pipe2[1]);
 
-    assign_matrixA();
-    cnt=0;
-   // printf("\n");
-    // for(int i=0; i<x; i++){
-    //     for(int j=0; j<z; j++){
-    //         printf("%d\t", matrixB[i][j]);
-    //     }
-    //     printf("\n");
-    // }
-    printf("Input matrix B\n");
-    //input matrixB
-    for (int i = 0; i < x; i++) {
-      for (int j = 0; j < z; j++) {
-         printf("Enter a%d%d: ", i+1, j+1);
-         scanf("%d", &matrixB[i][j]);
-      }
-   }
+  execlp("head", "head", "-5", NULL);
 
-    call_thread();
+  perror("bad exec head");
+  _exit(1);
 
-    shmdt(matrix);
-    shmctl(shmid, IPC_RMID, NULL);
 
-    return 0;
+  exit(0);
 }
 
-void *faktorial(void *arguments){
-    struct arg_struct *args = arguments;
+int main() {
 
-    int baris=args->arg1;
-    int kolom=args->arg2;
-    long long int hasil=1;
+  // bikin pipe1
+  if (pipe(pipe1) == -1) {
+    perror("bad pipe1");
+    exit(1);
+  }
 
-    if (matrixA[baris][kolom] == 0 || matrixB[baris][kolom] == 0){
-        printf("0");
-       // temp = 0;
-    }
-    else if(matrixA[baris][kolom]>=matrixB[baris][kolom]){
-        //a!/(a-b)!
-        int batas = matrixA[baris][kolom] - matrixB[baris][kolom];
-        for (int i = matrixA[baris][kolom]; i > batas; i--)
-        {
-            hasil = hasil*i;
-            //printf("%d ", i);
-        }
-        //printf("\n");
-        printf("%lld", hasil);
-        
-    }
-    else if(matrixB[baris][kolom]>matrixA[baris][kolom]){
-        //a!
-        for (int i = matrixA[baris][kolom]; i > 0; i--)
-        {
-            hasil = hasil * matrixA[baris][kolom];
-            //printf("%d ", matrixA[baris][kolom]);
-            matrixA[baris][kolom]--;
-        }
-        //printf("\n");
-        printf("%lld", hasil);
-    }
-    printf("\t\t");
-    pthread_exit(0);
+  if ((pid = fork()) == -1) {
+    perror("bad fork1");
+    exit(1);
+  } else if (pid == 0) {
+    exec1();
+  }
+
+  if (pipe(pipe2) == -1) {
+    perror("bad pipe2");
+    exit(1);
+  }
+
+  if ((pid = fork()) == -1) {
+    perror("bad fork2");
+    exit(1);
+  } else if (pid == 0) {
+    exec2();
+  }
+
+  close(pipe1[0]);
+  close(pipe1[1]);
+
+  if ((pid = fork()) == -1) {
+    perror("bad fork3");
+    exit(1);
+  } else if (pid == 0) {
+    exec3();
+    //exit(0);
+  }
+
 }
