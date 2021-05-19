@@ -14,10 +14,10 @@ int iret[x*z];
 key_t key = 1234;
 int *matrix;
 int cnt=0;
-const int matrixB[x][z] = {{1, 2, 3, 4, 5, 11}, {6, 7, 8, 9, 10, 14}, {1, 2, 3, 4, 5, 16}, {1, 2, 3, 4, 5, 16}};
+// const int matrixB[x][z] = {{14, 2, 3, 8, 8, 10}, {7, 4, 8, 5, 14, 9}, {9, 2, 13, 5, 11, 2}, {8, 7, 10, 4, 10, 8}};
 //const int matrixB[x][z] = {{1, 1, 1, 1, 1, 1}, {1, 1, 1, 1, 1, 1}, {1, 1, 1, 1, 1, 1}, {1, 1, 1, 1, 1, 1}};
 int matrixA[x][z];
-//int matrixB[x][z];
+int matrixB[x][z];
 int total=x*z;
 
 void *faktorial(void *arguments);
@@ -32,10 +32,10 @@ void assign_matrixA(){
     for(int i=0; i<x; i++){
         for(int j=0; j<z; j++){
             matrixA[i][j] = matrix[cnt];
-            printf("%d\t", matrixA[i][j]);
+            //printf("%d\t", matrixA[i][j]);
             cnt++;
         }
-        printf("\n");
+        //printf("\n");
     }
 }
 
@@ -70,21 +70,21 @@ int main(void){
 
     assign_matrixA();
     cnt=0;
-    printf("\n");
-    for(int i=0; i<x; i++){
-        for(int j=0; j<z; j++){
-            printf("%d\t", matrixB[i][j]);
-        }
-        printf("\n");
-    }
-    printf("\n");
+   // printf("\n");
+    // for(int i=0; i<x; i++){
+    //     for(int j=0; j<z; j++){
+    //         printf("%d\t", matrixB[i][j]);
+    //     }
+    //     printf("\n");
+    // }
+    printf("Input matrix B\n");
     //input matrixB
-//     for (int i = 0; i < x; i++) {
-//       for (int j = 0; j < z; j++) {
-//          printf("Enter a%d%d: ", i+1, j+1);
-//          scanf("%d", &matrixB[i][j]);
-//       }
-//    }
+    for (int i = 0; i < x; i++) {
+      for (int j = 0; j < z; j++) {
+         printf("Enter a%d%d: ", i+1, j+1);
+         scanf("%d", &matrixB[i][j]);
+      }
+   }
 
     call_thread();
 
@@ -105,7 +105,7 @@ void *faktorial(void *arguments){
         printf("0");
        // temp = 0;
     }
-    else if(matrixA[baris][kolom]>matrixB[baris][kolom]){
+    else if(matrixA[baris][kolom]>=matrixB[baris][kolom]){
         //a!/(a-b)!
         int batas = matrixA[baris][kolom] - matrixB[baris][kolom];
         for (int i = matrixA[baris][kolom]; i > batas; i--)
@@ -125,6 +125,7 @@ void *faktorial(void *arguments){
             //printf("%d ", matrixA[baris][kolom]);
             matrixA[baris][kolom]--;
         }
+        //printf("\n");
         printf("%lld", hasil);
     }
     printf("\t\t");
